@@ -1,5 +1,7 @@
 use std::env;
 
+use crate::ps_utils::get_target;
+
 mod open_file;
 mod process;
 mod ps_utils;
@@ -12,9 +14,11 @@ fn main() {
     }
     #[allow(unused)] // TODO: delete this line for Milestone 1
     let target = &args[1];
-
-    // TODO: Milestone 1: Get the target Process using psutils::get_target()
-    unimplemented!();
+    let process = get_target(target.as_str()).expect("get target process error");
+    if process == None {
+        std::process::exit(1);
+    }
+    println!("pid of target {} is {}", target, process.unwrap().pid);
 }
 
 #[cfg(test)]
