@@ -16,6 +16,7 @@ fn main() {
     let target = &args[1];
     let process = get_target(target.as_str()).expect("get target process error");
     if process == None {
+        println!("Target "{}" did not match any running PIDs or executables", target);
         std::process::exit(1);
     }
     println!("pid of target {} is {}", target, process.unwrap().pid);
