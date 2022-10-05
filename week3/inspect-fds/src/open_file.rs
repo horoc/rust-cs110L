@@ -1,5 +1,6 @@
 use regex::Regex;
 use std::collections::hash_map::DefaultHasher;
+use std::fs::read_link;
 use std::hash::{Hash, Hasher};
 #[allow(unused_imports)] // TODO: delete this line for Milestone 4
 use std::{fmt, fs};
@@ -84,7 +85,6 @@ impl OpenFile {
     /// extracts the cursor position of that file descriptor (technically, the position of the
     /// open file table entry that the fd points to) using a regex. It returns None if the cursor
     /// couldn't be found in the fdinfo text.
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     fn parse_cursor(fdinfo: &str) -> Option<usize> {
         // Regex::new will return an Error if there is a syntactical error in our regular
         // expression. We call unwrap() here because that indicates there's an obvious problem with
@@ -103,7 +103,6 @@ impl OpenFile {
     /// This file takes the contents of /proc/{pid}/fdinfo/{fdnum} for some file descriptor and
     /// extracts the access mode for that open file using the "flags:" field contained in the
     /// fdinfo text. It returns None if the "flags" field couldn't be found.
-    #[allow(unused)] // TODO: delete this line for Milestone 4
     fn parse_access_mode(fdinfo: &str) -> Option<AccessMode> {
         // Regex::new will return an Error if there is a syntactical error in our regular
         // expression. We call unwrap() here because that indicates there's an obvious problem with
@@ -136,8 +135,16 @@ impl OpenFile {
     /// without making a big deal of it.)
     #[allow(unused)] // TODO: delete this line for Milestone 4
     pub fn from_fd(pid: usize, fd: usize) -> Option<OpenFile> {
-        // TODO: implement for Milestone 4
-        unimplemented!();
+        let fd_path = format!("/proc/{}/fd/{}", pid, fd);
+        let link_file= fs::read_link(fd_path).ok()?;
+        let link_file_str = link_file.to_str().unwrap();
+        let info_path = format!("/proc/{}/fdinfo/{}", pid, fd);
+        let info_str = fs::read_to_string(info_path).ok()?;
+        Some(OpenFile { 
+            name: OpenFile::path_to_name(link_file_str),
+            cursor: OpenFile::parse_cursor(info_str.as_str()).unwrap(),
+            access_mode: OpenFile::parse_access_mode(info_str.as_str()).unwrap() 
+        })
     }
 
     /// This function returns the OpenFile's name with ANSI escape codes included to colorize
