@@ -19,7 +19,12 @@ fn main() {
         println!("Target \"{}\" did not match any running PIDs or executables", target);
         std::process::exit(1);
     }
-    process.unwrap().print();
+    let process_st = process.unwrap();
+    process_st.print();
+    let child_process = ps_utils::get_child_processes(process_st.pid).expect("get child process error");
+    for p in child_process {
+        p.print();
+    }
 }
 
 #[cfg(test)]

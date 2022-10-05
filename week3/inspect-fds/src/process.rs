@@ -1,7 +1,7 @@
 use crate::open_file::OpenFile;
+use std::fmt::{self, format};
 #[allow(unused)] // TODO: delete this line for Milestone 3
 use std::fs;
-use std::fmt::{self, format};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Process {
@@ -12,7 +12,11 @@ pub struct Process {
 
 impl fmt::Display for Process {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "========== \"{}\" (pid {}, ppid {}) ==========", self.command, self.pid, self.ppid)
+        write!(
+            f,
+            "========== \"{}\" (pid {}, ppid {}) ==========",
+            self.command, self.pid, self.ppid
+        )
     }
 }
 
@@ -57,6 +61,10 @@ impl Process {
     }
 
     pub fn print(&self) {
+        println!(
+            "========== \"{}\" (pid {}, ppid {}) ==========",
+            self.command, self.pid, self.ppid
+        );
         match self.list_open_files() {
             None => println!(
                 "Warning: could not inspect file descriptors for this process! \
